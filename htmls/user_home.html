@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Личный кабинет</title>
+</head>
+<body>
+  <button class="get_msgs">Посмотреть письма</button>
+  <button><a href="/user_write">Написать письмо от вашего имени</a></button>
+  <button><a href="/write">Написать анонимное письмо</a></button>
+  <button class="clean">Удалить все письма</button>
+
+  <script>
+    let get_msgs_btn = document.querySelector('.get_msgs');
+    let write_msg = document.querySelector('.write_msg');
+    let clean_btn = document.querySelector('.clean');
+    let arr = [];
+
+    get_msgs_btn.addEventListener('click', async ()=>{
+        await fetch("/home", {
+            method: "post",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            //make sure to serialize your JSON body
+            body: JSON.stringify({
+                action: "get_msgs"
+            })
+        }).then((res)=>{
+            res.json().then(async (data)=>{
+                arr = data.arr;
+                console.log(arr);
+                if (arr.length == 0){
+                    alert("На данный момент писем нет");
+                }else{
+                    console.log(2);
+                    let div = document.createElement('ul');
+                    document.body.appendChild(div);
+
+                    let newlistItem;
+                    for(let i = 0; i < arr.length; i++){
+                        newlistItem = document.createElement('li');
+                        newlistItem.textContent = arr[i];
+                        div.appendChild(newlistItem);
+                    }
+                }
+
+
+            })
+        })
+    })
+
+    clean_btn.addEventListener('click', ()=>{
+        fetch("/home", {
+            method: "post",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            //make sure to serialize your JSON body
+            body: JSON.stringify({
+                action: "clean"
+            })
+        }).then((res)=>{
+            location.reload();
+        })
+    })
+
+  </script>
+</body>
+</html>
